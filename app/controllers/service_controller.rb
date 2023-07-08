@@ -1,11 +1,16 @@
 class ServiceController < ApplicationController
-	def index
-		@services = Service.where("search_name like %#{params[:query]}%")
+
+	def show_service
+		@service = Service.where("service_name LIKE ?", "%#{params[:service_name]}%")
+		render json: @service
 	end
 
-	
-	def create
+	def index
+		@service = Service.all
+		render json: @service
+	end
 
+	def create
 		@service = Service.new(service_params)
 		@service.admin_id = @current_user.id
 		if @service.save
@@ -20,7 +25,6 @@ class ServiceController < ApplicationController
 		render json: Service.find(params[:id])
 	end
 	
-
 	def update
 		@service =  Service.find(params[:id])
 			if @service.update(service_params)
@@ -30,6 +34,12 @@ class ServiceController < ApplicationController
 				status: :unprocessable_entity
 		end
 	end
+
+	def destroy
+		@service  =  Service.find(params[:id])
+		@service.destroy
+		render json: @service 
+	end	
 
 	private
 	 def service_params
