@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "articles#index"
   resources :service
+  delete '/delete/service/:id', to: 'service#destroy'
   post '/auth/customer/login',to: 'customer_authentication#login'
   post '/auth/admin/login',to: 'admin_authentication#login'
   get '/services/search' ,to: 'service#show_service'

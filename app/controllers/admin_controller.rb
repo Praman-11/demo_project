@@ -1,19 +1,8 @@
 class AdminController < ApplicationController
   skip_before_action :authenticate_request, only: [:create]
   before_action :set_admin, only: [:show, :destroy]
+  before_action :check_admin , only:[:create,:show,:update,:destroy]
 
-  # GET /users
-  def index
-    @admin = Admin.all
-    render json: @admin, status: :ok
-  end
-
-  # GET /users/{username}
-  # def show
-  # 	admin = Admin.find_by_id(params[:id])
-  # 	render json: @admin, status: :ok
-  # end
-  # POST /users
   def create
     @admin = Admin.new(admin_params)
     if @admin.save

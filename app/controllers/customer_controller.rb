@@ -1,18 +1,15 @@
 class CustomerController < ApplicationController
   skip_before_action :authenticate_request, only: [:create]
   before_action :set_customer, only: [:show, :destroy]
+  before_action :check_admin, only: [:index, :show]
+  before_action :check_customer, only: [:create, :update, :destroy]
 
-  # GET /customer
   def index
+
     @customer = Customer.all
     render json: @customer, status: :ok
-  end
+ end
 
-  # GET /customer/{username}
-  # def show
-  # 	render json: @customer, status: :ok
-  # end
-  # POST /customer
   def create
     @customer = Customer.new(customer_params)
     if @customer.save

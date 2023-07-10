@@ -1,13 +1,20 @@
 class RatingController < ApplicationController
+  before_action :check_customer, only: [:create,:search_city_wise,:search_nearby_location,:sort_listing_service_on_rating,:filter_services_on_rating]
+
   def create
-    @rating = @current_user.ratings.new(rating_params)
-    if @rating.save
+    # byebug
+    # begin
+      new_rating = @current_user.ratings.new(rating_params)
+    if new_rating.save
       update_rating(params[:service_id])
-      render json: @rating, status: :ok
+      render json: new_rating, status: :ok
     else
-      render json: { errors: @rating.errors.full_messages },
+      render json: { errors: new_rating.errors.full_messages },
              status: :unprocessable_entity
     end
+  # rescue Exception => e
+  #   render json: {error: e.to_s}
+  # end
   end
 
   def search_city_wise

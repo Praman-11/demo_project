@@ -1,9 +1,20 @@
 class ServiceController < ApplicationController
 
+	before_action :check_admin, only: [ :create,:show_service, :show, :update, :destroy]
+	before_action :check_customer, only: [:index ]
 	def show_service
-		@service = Service.where("service_name LIKE ?", "%#{params[:service_name]}%")
-		render json: @service
+		if params[:service_name].blank?
+			render json: {error: "empty service_name :("}
+		else
+			@service = Service.where("service_name LIKE ?", "%#{params[:service_name]}%")
+			if @service.length
+				render json: @service
+			else
+				render json: {error:"Please Enter search_name :( "}
+			end
+		end
 	end
+
 
 	def index
 		@service = Service.all
@@ -21,29 +32,35 @@ class ServiceController < ApplicationController
 		end
 	end
 
-	def show
-		render json: Service.find(params[:id])
-	end
-	
 	def update
-		@service =  Service.find(params[:id])
+		@service =  Service.find_by_id(params[:id])
+		if !@service
 			if @service.update(service_params)
-			render json: @service, status: :ok
-		else
-			render json: {error: @service.errors.full_messages},
+				render json: @service, status: :ok
+			else
+				render json: {error: @service.errors.full_messages},
 				status: :unprocessable_entity
+			end
+		else
+			render json: {error: "this service is not found :( "}
 		end
 	end
 
 	def destroy
-		@service  =  Service.find(params[:id])
-		@service.destroy
-		render json: @service 
+		# byebug
+		@service = @current_user.services.find_by(id: params[:id])
+		if @service 
+			@service.destroy
+			render json: @service 
+		else
+			render json: {error: " id not found :( "}
+		end
 	end	
 
+
 	private
-	 def service_params
-	 	params.permit(:service_name, :location, :status)
-	 end
+	def service_params
+		params.permit(:service_name, :location, :status)
+	end
 
 end
