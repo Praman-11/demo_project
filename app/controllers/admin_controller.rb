@@ -1,7 +1,7 @@
 class AdminController < ApplicationController
   skip_before_action :authenticate_request, only: [:create]
-  before_action :set_admin, only: [:show, :destroy]
-  before_action :check_admin , only:[:create,:show,:update,:destroy]
+  before_action :set_admin, only: [:update, :destroy]
+  before_action :check_admin , only:[:show,:update,:destroy]
 
   def create
     @admin = Admin.new(admin_params)
@@ -18,15 +18,28 @@ class AdminController < ApplicationController
   end
 
   def update
-    unless @admin.update(admin_params)
-      render json: { errors: @admin.errors.full_messages },
-             status: :unprocessable_entity
+    @admin = Admin.where(id: @current_user.id).find_by(id: params[:id])
+    if @admin.present?
+      if @admin.update(admin_params)
+        render json: @admin, status: :ok
+      else
+        render json: { errors: @admin.errors.full_messages },
+        status: :unprocessable_entity
+      end
+    else
+      render json: {error: "you are not valid admin :("}
     end
   end
 
-  def destroy
-    @admin.destroy
-  end
+    def destroy
+      @admin = Admin.where(id: @current_user.id).find_by(id: params[:id])
+      if @admin.present?
+        @admin.destroy
+        render json: {error: "admin deleted :("}
+      else
+        render json: {error:"you are not valid admin :("}
+      end
+    end
 
   private
 

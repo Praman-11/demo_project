@@ -2,8 +2,6 @@ class RatingController < ApplicationController
   before_action :check_customer, only: [:create,:search_city_wise,:search_nearby_location,:sort_listing_service_on_rating,:filter_services_on_rating]
 
   def create
-    # byebug
-    # begin
       new_rating = @current_user.ratings.new(rating_params)
     if new_rating.save
       update_rating(params[:service_id])
@@ -12,25 +10,33 @@ class RatingController < ApplicationController
       render json: { errors: new_rating.errors.full_messages },
              status: :unprocessable_entity
     end
-  # rescue Exception => e
-  #   render json: {error: e.to_s}
-  # end
   end
 
   def search_city_wise
-    if params[:location]
+     
+    if !params[:location].blank? 
       @service = Service.where("location LIKE ?", "%#{params[:location]}%")
+      if  @service.find_by(location: params[:location])   
       render json: @service
-    else
+      else
       render json: { error: "Can't find location" },
              status: :unprocessable_entity
+      end
+    else
+    render json: {error: 'location is blank'}
     end
   end
 
   def search_nearby_location
+    # byebug
     @service = Service.where(location: @current_user.location)
+    if @service.length == 0
+      render json: { error: "Can't find services in this location :(" }
+    else
     render json: @service
+    end
   end
+
 
   def sort_listing_service_on_rating
     services = Service.order(avg_rating: :desc)
@@ -38,11 +44,15 @@ class RatingController < ApplicationController
   end
 
   def filter_services_on_rating
-    if params[:rating]
+    if !params[:rating].blank?
       services = Service.where(avg_rating: params[:rating])
+      if services.find_by(avg_rating: params[:rating])
       render json: services
+      else
+      render json: { error: "cant find this type rating :(" }
+      end
     else
-      render json: { error: "can't find rating" }
+      render json: {error:"rating is blank :( "}
     end
   end
 
