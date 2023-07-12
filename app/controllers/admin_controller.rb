@@ -1,14 +1,14 @@
 class AdminController < ApplicationController
   skip_before_action :authenticate_request, only: [:create]
-  before_action :set_admin, only: [:update, :destroy]
-  before_action :check_admin , only:[:show,:update,:destroy]
+  before_action :set_admin, only: %i[update destroy]
+  before_action :check_admin, only: %i[show update destroy]
 
   def create
-    @admin = Admin.new(admin_params)
-    if @admin.save
-      render json: @admin, status: :created
+    admin = Admin.new(admin_params)
+    if admin.save
+      render json: admin, status: :created
     else
-      render json: { errors: @admin.errors.full_messages },
+      render json: { errors: admin.errors.full_messages },
              status: :unprocessable_entity
     end
   end
@@ -18,28 +18,28 @@ class AdminController < ApplicationController
   end
 
   def update
-    @admin = Admin.where(id: @current_user.id).find_by(id: params[:id])
-    if @admin.present?
-      if @admin.update(admin_params)
-        render json: @admin, status: :ok
+    admin = Admin.where(id: @current_user.id).find_by(id: params[:id])
+    if admin.present?
+      if admin.update(admin_params)
+        render json: admin, status: :ok
       else
-        render json: { errors: @admin.errors.full_messages },
-        status: :unprocessable_entity
+        render json: { errors: admin.errors.full_messages },
+               status: :unprocessable_entity
       end
     else
-      render json: {error: "you are not valid admin :("}
+      render json: { error: 'you are not valid admin :(' }
     end
   end
 
-    def destroy
-      @admin = Admin.where(id: @current_user.id).find_by(id: params[:id])
-      if @admin.present?
-        @admin.destroy
-        render json: {error: "admin deleted :("}
-      else
-        render json: {error:"you are not valid admin :("}
-      end
+  def destroy
+    admin = Admin.where(id: @current_user.id).find_by(id: params[:id])
+    if admin.present?
+      admin.destroy
+      render json: { error: 'admin deleted :(' }
+    else
+      render json: { error: 'you are not valid admin :(' }
     end
+  end
 
   private
 
@@ -48,6 +48,6 @@ class AdminController < ApplicationController
   end
 
   def set_admin
-    @admin = Admin.find(params[:id])
+    admin = Admin.find(params[:id])
   end
 end
