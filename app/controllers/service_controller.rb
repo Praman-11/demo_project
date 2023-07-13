@@ -23,6 +23,7 @@ class ServiceController < ApplicationController
   def create
     service = Service.new(service_params)
     service.admin_id = @current_user.id
+    # service.image.attach(params[:image])
     if service.save
       render json: service, status: :created
     else
@@ -59,6 +60,6 @@ class ServiceController < ApplicationController
   private
 
   def service_params
-    params.permit(:service_name, :location, :status)
+    params.permit(:service_name, :location, :status, :image)
   end
 end

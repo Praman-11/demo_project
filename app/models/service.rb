@@ -7,4 +7,5 @@ class Service < ApplicationRecord
   validates :service_name, presence: true
   validates :location, presence: true
   validates :status, presence: true
+  has_one_attached :image
 end
