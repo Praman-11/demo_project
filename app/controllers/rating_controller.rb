@@ -1,16 +1,14 @@
-class RatingController < ApplicationController
-  before_action :check_customer,
-                only: %i[create search_city_wise search_nearby_location sort_listing_service_on_rating
-                         filter_services_on_rating]
+class RatingController < ApiController
+  before_action :check_customer
 
   def create
     new_rating = @current_user.ratings.new(rating_params)
     if new_rating.save
-      update_rating(params[:service_id])
+      # update_rating(params[:service_id])
       render json: new_rating, status: :ok
     else
       render json: { errors: new_rating.errors.full_messages },
-             status: :unprocessable_entity
+      status: :unprocessable_entity
     end
   end
 
@@ -21,7 +19,7 @@ class RatingController < ApplicationController
         render json: service
       else
         render json: { error: "Can't find location" },
-               status: :unprocessable_entity
+        status: :unprocessable_entity
       end
     else
       render json: { error: 'location is blank' }
@@ -29,7 +27,6 @@ class RatingController < ApplicationController
   end
 
   def search_nearby_location
-    # byebug
     service = Service.where(location: @current_user.location)
     if service.length == 0
       render json: { error: "Can't find services in this location :(" }
@@ -62,17 +59,9 @@ class RatingController < ApplicationController
     params.permit(:feedback, :rating, :service_id)
   end
 
-  def update_rating(id)
-    # byebug
-    service = Service.find(id)
-    ids = service.ratings.pluck(:rating)
-    total = 0
-    count = 0
-    ids.each do |i|
-      total += i
-      count += 1
-    end
-    avg_rating = total / count
-    service.update(avg_rating:)
-  end
+  # def update_rating(id)
+  #   service = Service.find(id)
+  #   avg_rating = service.ratings.average(:rating)
+  #   service.update(avg_rating: avg_rating)
+  # end
 end

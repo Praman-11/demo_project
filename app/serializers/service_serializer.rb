@@ -1,10 +1,10 @@
 class ServiceSerializer < ActiveModel::Serializer
-  attributes :id, :service_name, :location, :status, :avg_rating, :image
-  belongs_to :admin
   has_many :ratings
+  attributes :id, :service_name, :location, :status, :image, :avg_rating
+  # belongs_to :admin
+  
 
   def image
     object.image.url
   end
-  
 end

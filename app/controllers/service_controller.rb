@@ -1,59 +1,49 @@
-class ServiceController < ApplicationController
-  before_action :check_admin, only: %i[create show_service show update destroy]
-  before_action :check_customer, only: [:index]
+class ServiceController < ApiController
+  before_action :check_admin, only: %i[create update destroy]
+  before_action :set_services, only: %i[update destroy]
 
-  def show_service
-    if params[:service_name].blank?
-      render json: { error: 'empty service_name :(' }
+  def index
+    service = params[:service_name].blank? ? Service.all : Service.where("service_name LIKE ?", "%#{params[:service_name]}%")
+    if service.length == 0
+      render json: { message: "service_name not found :(" }
     else
-      service = Service.where('service_name LIKE ?', "%#{params[:service_name]}%")
-      if service.length
-        render json: service
-      else
-        render json: { error: 'Please Enter search_name :( ' }
-      end
+      render json: service
     end
   end
 
-  def index
-    service = Service.all
-    render json: service
-  end
-
   def create
-    service = Service.new(service_params)
-    service.admin_id = @current_user.id
-    # service.image.attach(params[:image])
-    if service.save
+    service = @current_user.services.new(service_params)
+    # service.admin_id = @current_user.id
+    if service.save!
       render json: service, status: :created
     else
       render json: { error: service.errors.full_messages },
-             status: :unprocessable_entity
+      status: :unprocessable_entity
     end
   end
 
   def update
-    service = Service.find_by_id(params[:id])
-    if service
-      if service.update(service_params)
-        render json: service, status: :ok
+    # service = Service.find_by_id(params[:id])
+    if @service
+      if @service.update(service_params)
+        render json: @service, status: :ok
       else
-        render json: { error: service.errors.full_messages },
-               status: :unprocessable_entity
+        render json: { error: @service.errors.full_messages },
+        status: :unprocessable_entity
       end
     else
-      render json: { error: 'this service is not found :( ' }
+      render json: { error: "this service is not found :( " }
     end
   end
 
   def destroy
     # byebug
-    service = @current_user.services.find_by(id: params[:id])
-    if service
-      service.destroy
-      render json: service
+    # service = @current_user.services.find_by(id: params[:id])
+    if @service
+      @service.destroy
+      render json: @service
     else
-      render json: { error: ' id not found :( ' }
+      render json: { error: " id not found :( " }
     end
   end
 
@@ -61,5 +51,9 @@ class ServiceController < ApplicationController
 
   def service_params
     params.permit(:service_name, :location, :status, :image)
+  end
+
+  def set_services
+    @service = Service.find_by_id(params[:id])
   end
 end

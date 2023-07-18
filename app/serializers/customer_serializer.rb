@@ -1,4 +1,4 @@
-class CustomerSerializer < ActiveModel::Serializer
-  attributes :id, :name, :email, :location
-  has_many :ratings
-end
+# class CustomerSerializer < ActiveModel::Serializer
+#   attributes :id, :name, :email, :location
+#   # has_many :ratings
+# end
