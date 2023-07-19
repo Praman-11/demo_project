@@ -29,12 +29,15 @@ class ServiceController < ApiController
   end
 
   def update
-    service = @current_user.services.find_by(id:params[:id]) if params[:id]
-    if service.update(service_params)
-      render json: service, status: :ok
+    service = @current_user.services.find_by(id:params[:id]) if params[:id].present?
+    if service.present?
+      if service.update(service_params)
+        render json: service, status: :ok
+      end
+    else
+      render json: { error: "You are not valid user" },
+      status: :unprocessable_entity
     end
-    render json: { error: service.errors.full_messages },
-    status: :unprocessable_entity
   end
 
   def destroy

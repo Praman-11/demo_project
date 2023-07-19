@@ -20,6 +20,8 @@ class UsersController < ApiController
       render json: { errors: user.errors.full_messages },
       status: :unprocessable_entity
     end
+  rescue Exception => error
+    render json: { error: error }, status: :unprocessable_entity
   end
 
   def update
@@ -34,7 +36,7 @@ class UsersController < ApiController
   def destroy
     if @current_user.present?
       @current_user.destroy
-      render json: { message: "user Deleted !! See you again #{@current_user} :( " }
+      render json: { message: "Account Deleted !! See you again #{@current_user} :( " }
     else
       render json: { error: "you are not valid user :(" }
     end
