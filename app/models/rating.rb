@@ -12,5 +12,5 @@ class Rating < ApplicationRecord
     avg_rating = service.ratings.average(:rating)
     service.update(avg_rating: avg_rating)
   end
-  # validates :location, presence: true
+ 
 end

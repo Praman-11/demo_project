@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   # --------------service_routes-----------------
   resources :service
   delete "/delete/service/:id", to: "service#destroy"
-  get "/services/search", to: "service#show_service"
+  # get "/services/search", to: "service#show_service"
   # --------------user_routes--------------------
   resources :users
   post "/auth/user/login", to: "user_authentication#login"

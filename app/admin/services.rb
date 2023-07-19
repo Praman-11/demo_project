@@ -1,4 +1,22 @@
 ActiveAdmin.register Service do
+  actions :index, :show 
+
+index do
+  selectable_column
+  column :service_id
+  column :service_name
+  column :status
+  column :location
+  column :created_at
+  column :updated_at
+
+  actions
+end
+
+filter :service_id
+filter :service_name
+filter :status
+
 
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters

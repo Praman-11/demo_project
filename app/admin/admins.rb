@@ -1,6 +1,5 @@
 ActiveAdmin.register Admin do
-actions :index , :show , :delete
-
+actions :index, :show , :destroy 
 
 index do
   selectable_column
@@ -12,8 +11,6 @@ index do
 end
 
 filter :email
-filter :current_sign_in_at
-filter :sign_in_count
 filter :created_at
 filter :location
 

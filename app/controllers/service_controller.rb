@@ -1,19 +1,25 @@
 class ServiceController < ApiController
   before_action :check_admin, only: %i[create update destroy]
-  before_action :set_services, only: %i[update destroy]
+  before_action :check_customer, only: [:index]
 
   def index
-    service = params[:service_name].blank? ? Service.all : Service.where("service_name LIKE ?", "%#{params[:service_name]}%")
-    if service.length == 0
-      render json: { message: "service_name not found :(" }
-    else
-      render json: service
-    end
+    service = Service.all
+
+    service = service.where(location: @current_user.location) if params[:near_location]
+    
+    service = service.where(avg_rating: params[:rating]) if params[:rating].present?
+    
+    service = service.order(avg_rating: :desc) if params[:avg_rating].present?
+    
+    service = service.where("location LIKE ?", "%#{params[:location]}%") if params[:location].present?
+    
+    service = service.where(" service_name LIKE ? ", "%#{params[:service_name]}%" ) if params[:service_name].present?
+
+    render json: service
   end
 
   def create
     service = @current_user.services.new(service_params)
-    # service.admin_id = @current_user.id
     if service.save!
       render json: service, status: :created
     else
@@ -23,25 +29,18 @@ class ServiceController < ApiController
   end
 
   def update
-    # service = Service.find_by_id(params[:id])
-    if @service
-      if @service.update(service_params)
-        render json: @service, status: :ok
-      else
-        render json: { error: @service.errors.full_messages },
-        status: :unprocessable_entity
-      end
-    else
-      render json: { error: "this service is not found :( " }
+    service = @current_user.services.find_by(id:params[:id]) if params[:id]
+    if service.update(service_params)
+      render json: service, status: :ok
     end
+    render json: { error: service.errors.full_messages },
+    status: :unprocessable_entity
   end
 
   def destroy
-    # byebug
-    # service = @current_user.services.find_by(id: params[:id])
-    if @service
-      @service.destroy
-      render json: @service
+    if service = @current_user.services.find_by(id:params[:id])
+      service.destroy
+      render json: {message: "service Deleted successfully see you again :("}
     else
       render json: { error: " id not found :( " }
     end
@@ -53,7 +52,4 @@ class ServiceController < ApiController
     params.permit(:service_name, :location, :status, :image)
   end
 
-  def set_services
-    @service = Service.find_by_id(params[:id])
-  end
 end
