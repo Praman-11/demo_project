@@ -1,10 +1,7 @@
 class UsersController < ApiController
   skip_before_action :authenticate_request, only: [:create]
-  before_action :authenticate_request, only: %i[index update destroy ]
-  before_action :check_admin, only: [:index]
 
-
-  def index
+  def show
     render json: Customer.all, status: :ok
   end
 
@@ -45,7 +42,7 @@ class UsersController < ApiController
   private
 
   def user_params
-    params.permit(:name, :email, :password, :location, :type)
+    params.permit(:name, :email, :password, :location)
   end
 
 end

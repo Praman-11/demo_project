@@ -1,5 +1,4 @@
 class RatingController < ApiController
-  before_action :check_customer
 
   def create
     new_rating = @current_user.ratings.new(rating_params)

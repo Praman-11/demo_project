@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   resources :service
   delete "/delete/service/:id", to: "service#destroy"
   # --------------user_routes--------------------
-  resources :users
+  resource :users
   post "/auth/user/login", to: "user_authentication#login"
 # -------------rating_routes-------------------
   resources :rating, only: [:create]

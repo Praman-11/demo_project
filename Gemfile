@@ -22,6 +22,8 @@ gem "devise"
 gem "activeadmin"
 gem "sprockets", "<4"
 gem "sass-rails"
+
+gem 'cancancan'
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"
 

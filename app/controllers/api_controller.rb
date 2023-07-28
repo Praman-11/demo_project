@@ -2,6 +2,18 @@ class ApiController < ActionController::API
   include JsonWebToken
   before_action :authenticate_request
 
+  rescue_from ActiveRecord::RecordNotFound do |exception|
+    render json: {warning: exception}
+  end
+
+  rescue_from CanCan::AccessDenied do |exception|
+    render json: { warning: exception}
+  end
+
+  def current_user
+    @current_user
+  end
+
   private
 
   def authenticate_request
@@ -11,18 +23,6 @@ class ApiController < ActionController::API
     @current_user = User.find(decoded[:user_id])
   rescue StandardError
     render json: { error: "Unauthorized User" }, status: 400
-  end
-
-  def check_admin
-    if @current_user.type != "Admin"
-      render json: { error: "Customer Not Allowed " }, status: 400
-    end
-  end
-
-  def check_customer
-    if @current_user.type != "Customer"
-      render json: { error: " Admin Not Allowed " }, status: 400
-    end
   end
 
   before_action do

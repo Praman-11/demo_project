@@ -1,6 +1,5 @@
 class ServiceController < ApiController
-  before_action :check_admin, only: %i[create update destroy]
-  before_action :check_customer, only: [:index]
+  load_and_authorize_resource
 
   def index
     service = Service.all
@@ -20,7 +19,7 @@ class ServiceController < ApiController
 
   def create
     service = @current_user.services.new(service_params)
-    if service.save!
+    if service.save
       render json: service, status: :created
     else
       render json: { error: service.errors.full_messages },
@@ -29,23 +28,16 @@ class ServiceController < ApiController
   end
 
   def update
-    service = @current_user.services.find_by(id:params[:id]) if params[:id].present?
-    if service.present?
+    service = @current_user.services.find_by(id:params[:id]) 
       if service.update(service_params)
         render json: service, status: :ok
       end
-    else
-      render json: { error: "You are not valid user" },
-      status: :unprocessable_entity
-    end
   end
 
   def destroy
     if service = @current_user.services.find_by(id:params[:id])
       service.destroy
       render json: {message: "service Deleted successfully see you again :("}
-    else
-      render json: { error: " id not found :( " }
     end
   end
 
